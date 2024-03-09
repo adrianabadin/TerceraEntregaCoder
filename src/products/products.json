@@ -1,0 +1,47 @@
+[
+    {
+        "code": "A1",
+        "description": "Green Lintern Lintern",
+        "price": 11,
+        "stock": 1,
+        "thumbnail": "missing",
+        "title": "Lintern",
+        "id": 1
+    },
+    {
+        "code": "A2",
+        "description": "Thanos Guantlet with all of the infinity Stones embedded in ",
+        "price": 54,
+        "stock": 1,
+        "thumbnail": "Preaty Picture",
+        "title": "Thanos Guantlet",
+        "id": 2
+    },
+    {
+        "code": "A3",
+        "description": "Green and shiny",
+        "price": 11,
+        "stock": 33,
+        "thumbnail": "Whats that",
+        "title": "Some Kriptonite",
+        "id": 3
+    },
+    {
+        "code": "A4",
+        "description": "Black and cool car ",
+        "price": 56,
+        "stock": 1,
+        "thumbnail": "Secret",
+        "title": "Batmans BatMovile",
+        "id": 4
+    },
+    {
+        "code": "A9",
+        "description": "Superman Glasses what else do you need",
+        "price": 16,
+        "stock": 1,
+        "thumbnail": "any",
+        "title": "Superman Glasses",
+        "id": "41ca385a-5444-47ec-bd49-2b024e83aa33"
+    }
+]

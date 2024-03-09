@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/sty.css">
+    <title>CoderHouse Sockets Feat</title>
+</head>
+
+<body>
+    <header style="display: flex; flex-direction: column;">
+        {{#if user}}
+        <span>Bienvenido {{user.username}}</span>
+        {{else}}
+        <div class="menu" style="align-items: end;"> <a href="/auth/login">Login</a>
+        </div>
+        {{/if}}
+        <div> CoderHouse Sockets Feat</div>
+        <div class="menu">
+            <a href="/">Inicio</a>
+            <a href="/addProduct">Agregar Producto</a>
+            <a href="/realTimeProducts">RealTime view</a>
+            <a href="/chat">Chat</a>
+            <a href="/auth/profile">Perfil de usuario</a>
+
+
+
+        </div>
+    </header>
+    {{{body}}}
+    <footer>
+        Alumno: Adrian Daniel
+    </footer>
+</body>
+<template id="productCardTemplate">
+    <article class="productCard">
+        <div class="cardTitle"></div>
+        <div class="cardBody"></div>
+        <button class="cardButon">Enviar</button>
+    </article>
+</template>
+
+</html>

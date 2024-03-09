@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+header,
+footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-family: sans-serif;
+  background-color: black;
+  color: yellow;
+  font-weight: bold;
+  height: 120px;
+}
+section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.productCard {
+  max-width: 150px;
+  display: flex;
+  flex-direction: column;
+  margin: 2rem;
+  justify-content: space-between;
+}
+.cardTitle {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.cardBody {
+  padding-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.cardButon {
+  border-radius: 20%;
+  outline: 1px solid #333;
+  box-shadow: 3px 3px 15px #666;
+  padding: 0.5rem;
+}
+.cardButon:hover {
+  box-shadow: 3px 3px 15px #333;
+  outline: 2px solid #000;
+}
+
+form {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding: 2rem;
+  margin: 1rem;
+  outline: 1px solid #333;
+  box-shadow: 3px 3px 15px #666;
+}
+.chatInput {
+  padding: 1rem;
+  border-radius: 15%;
+  border: 2px solid #333;
+  min-width: 400px;
+}
+.chatButton {
+  padding: 1rem;
+  border-radius: 15%;
+  border: 2px solid #999;
+  background-color: blue;
+  color: #000;
+}
+
+.chatSection {
+  margin: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  border: 3px solid #333;
+  box-shadow: 3px 3px 15px #999;
+}
+.chatBox {
+  margin: 2rem;
+  min-height: 300px;
+  border: 2px solid #333;
+  box-shadow: 3px 3px 15px #999;
+}
+.chatSection > article {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+}
+.userLogged {
+  text-align: end;
+}
+.brodcastedMessage {
+  text-align: left;
+}
+.menu {
+  font-size: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+}
+.menu > a {
+  padding: 12px;
+}

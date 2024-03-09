@@ -1,0 +1,17 @@
+<main>
+    <section>
+        {{#each content}}
+        <article class="productCard" id={{id}}>
+            <div class="cardTitle">{{title}}</div>
+            <div class="cardBody">
+                <span>Description :{{description}}</span>
+                <span>Price :{{price}}</span>
+                <span>Image :{{thumbnail}}</span>
+                <span>Code :{{code}}</span>
+                <span>Stock :{{number}}</span>
+            </div>
+            <button class="cardButon">Ingresar</button>
+        </article>
+        {{/each}}
+    </section>
+</main>
