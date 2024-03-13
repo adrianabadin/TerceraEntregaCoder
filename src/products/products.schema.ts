@@ -1,4 +1,4 @@
-import { Severity, modelOptions, prop } from "@typegoose/typegoose";
+import { Severity, getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 @modelOptions({options: {allowMixed:0}})
 export class Products{
     @prop({required: true})
@@ -16,3 +16,4 @@ export class Products{
     
 
 }
+export const productModel =getModelForClass(Products)

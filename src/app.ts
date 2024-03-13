@@ -3,7 +3,7 @@ import { productRoute } from "./products/products.routes";
 import { engine } from "express-handlebars";
 import path = require("path");
 import cookieParser from "cookie-parser"
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { AppController } from "./app.controller";
 import { appRoutes } from "./app.routes";
 import http from "http";
@@ -16,6 +16,7 @@ import "./auth/auth.passport.gh"
 import "./auth/auth.passport.jwt"
 import {z} from "zod"
 import passport = require("passport");
+import { mailRouter } from "./mailing/mailing.routes";
 declare module 'express-session' {
     interface SessionData {   
       user: string;
@@ -26,7 +27,9 @@ const dotEnvSchema = z.object({
   connection :z.string().min(1,{message:"Must provide a connection string"}),
   id:z.string().min(1,{message:"Must provide an id for github oAuth"}),
   secret :z.string().min(1,{message:"Must provide a a secret for gitHub oAuth"}),
-  callback:z.string().url({message:"Must provide a valid callback for github oAuth"})
+  callback:z.string().url({message:"Must provide a valid callback for github oAuth"}),
+  gmail:z.string().min(3,{message:"Must provide a gmail account key"}),
+  gmailUser:z.string().email()
 })
 dotEnvSchema.parse(process.env)
 declare global {
@@ -46,7 +49,13 @@ const session =Session({
 const app = express();
 const httpServer = http.createServer(app);
 export const io = new Server(httpServer); // <- Aquí creamos el servidor de Socket.io
-
+io.engine.use((req:Request, res:Response, next:NextFunction) => {
+  if (!("_query" in req && typeof req._query==="object" &&req._query !==null && "sid" in req._query && req._query.sid !== undefined))
+  {
+    passport.authenticate("jwt", { session: false })(req, res, next);  
+  }else next()
+}
+);
 const appController = new AppController();
 app.use(express.static('src/public'));
 app.engine("handlebars", engine());
@@ -64,6 +73,7 @@ app.use(appRoutes);
 app.use("/api/", productRoute);
 app.use("/api/carts", cartRouter);
 app.use("/auth",authRouter)
+app.use("/mail/",mailRouter)
 app.use(appController.getAllProducts);
 
 io.on('connection', (socket) => { // <- Aquí manejamos las conexiones

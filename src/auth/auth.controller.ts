@@ -29,9 +29,13 @@ this.validateRol=this.validateRol.bind(this)
     }
     validateRol (admitedRoles:zodCreateUserType["body"]["role"]){return (req:Request,res:Response,next:NextFunction)=>{
     console.log("dentro de validateRol",req.user)
-        if (req.user !== undefined && "role" in req.user){
-        if (admitedRoles === req.user.role)  next()
-        else res.send("Unauthorized")
+    if (req.user !== undefined && "role" in req.user){
+        if (admitedRoles === req.user.role)  {
+            console.log("Autorizado")
+            next()
+}        else {
+    console.log("No Autorizado"	)
+    res.send("Unauthorized")}
     }else res.render("login")
     }}
     logout(req:Request,res:Response){

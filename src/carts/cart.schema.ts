@@ -1,20 +1,47 @@
-import { Ref, modelOptions, prop } from "@typegoose/typegoose"
+import { Ref, getModelForClass, modelOptions, prop } from "@typegoose/typegoose"
 import { Products } from '../products/products.schema';
 import mongoose from 'mongoose';
 import Schema from 'mongoose';
 import {z} from "zod"
+import { v4 } from "uuid";
 //import { Product } from '../entities/products';
 //type Product={pid:string,quantity:number}
 @modelOptions({options: {allowMixed:0}})
-export class Product{
-@prop({ref:Products})
+export class ProductItem{
+@prop({ref:()=>Products,autopopulate:true})
 pid!:Ref<Products>
-@prop()
+@prop({required:true})
 quantity!:number
 }
+export const productItemModel= getModelForClass(ProductItem)
+// interface Product{
+//     pid:Ref<Products>
+//     quantity:number
+// }
 @modelOptions({options: {allowMixed:0}})
 export class CartSchema {
-    @prop({required:false})
-    public products?:Product[]
-
+    @prop({required:false,ref:()=>ProductItem,autopopulate:true,default:[]})
+    public products!:Ref<ProductItem>[]
 }
+export const cartModel=getModelForClass(CartSchema)
+
+@modelOptions({options:{allowMixed:0}})
+export class Ticket{
+    @prop({required:true,default:0})
+    public amount!:number
+    @prop({required:true})
+    public purchaser!:string
+    @prop({required:true,default:new mongoose.mongo.ObjectId(),unique:true})
+    public code!:string
+    @prop({required:true,default:new Date()})
+    public purchased_datatime!:Date
+}
+export const newTicket = getModelForClass(Ticket,{schemaOptions:{timestamps:{createdAt:"purchased_datatime"}}})
+/**
+ * - Id (autogenerado por mongo)
+- code: String debe autogenerarse y ser único
+- purchase_datetime: Deberá guardar la fecha y hora exacta en la cual se formalizó la compra - (básicamente es un created_at)
+- amount: Number, total de la compra.
+- purchaser: String, contendrá el correo del usuario asociado al carrito.
+
+ */

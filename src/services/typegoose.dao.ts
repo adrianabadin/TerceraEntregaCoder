@@ -1,5 +1,5 @@
 import { getModelForClass, modelOptions } from "@typegoose/typegoose";
-import { CartSchema } from "../carts/cart.schema";
+import { CartSchema} from "../carts/cart.schema";
 import { Products } from "../products/products.schema";
 import mongoose, { FilterQuery, Model, MongooseQueryOptions, QueryOpThatReturnsDocument, QueryOptions, Schema } from "mongoose";
 import { AnyParamConstructor, ModelType } from "@typegoose/typegoose/lib/types";
@@ -10,7 +10,7 @@ const connectionString="mongodb+srv://dcsweb:adrian123@dcsweb.snm3hyr.mongodb.ne
 
 export class TypegooseDAO<T extends Products| CartSchema|ChatMessage|Omit<zodCreateUserType["body"],"password2">> {
     static instance:any
-    public model!:ModelType<T>
+    public model!:ModelType<T>| any
      constructor(
 protected schema: AnyParamConstructor<T>,
 protected modelName:string,
@@ -32,7 +32,7 @@ protected modelName:string,
         }
         async getProducts(limit?: number,page?:number,sort?:{field:keyof T,descending:boolean},query?:FilterQuery<T>){
             try{
-                const totalRecords = (await this.model.count())
+                const totalRecords = (await this.model.count() )
                 console.log(totalRecords)
                 limit=limit || 10
                 page=page ||1

@@ -12,11 +12,13 @@ export class PassportController {
     constructor (
         protected passportServicedb= passportService    ){
             this.jwtLoginVerify=this.jwtLoginVerify.bind(this)
+
         }
 
         async localLogin(req:Request,email:string,password:string,done:(error:any,data:any,...args:any)=>any){
 try{
-        const data = await passportService.findByEmail(email)
+        const data = await passportService.findByEmail(email.toUpperCase())
+        console.log(data)
         if (data !==undefined){
             const response = data
             if (response !== null&& typeof response ==="object" && "password" in response){
@@ -30,6 +32,7 @@ try{
     return done(e,null)
 }
     }
+
     async localSignUp(req:Request<any,any,zodCreateUserType["body"]>,email:string,password:string,done:(error:any,data:any,...args:any)=>any){
         try{
             console.log(email)
@@ -40,12 +43,12 @@ try{
                     return done(new Error("User Alrready exists"),null)
             }else {
                 //aqui va el codigo que crea el usuario 
-                const cartData = await cartService.createCart()
+                const cartData = await cartService.createCart([])
                 
                 let response
                 if (cartData.data !== undefined && typeof cartData.data ==="object"&& cartData.data !== null && "_id" in cartData.data) {
                     
-                 response = await passportService.createUser({...req.body,password:await argon.hash(password),cartId:cartData.data._id})
+                 response = await passportService.createUser({...req.body,email:req.body.email.toUpperCase(),password:await argon.hash(password),cartId:cartData.data._id})
                 }
                 if(response !== undefined && response !==null){
                     if (typeof response === "object" && response !==null&& "_id" in response)
@@ -97,15 +100,19 @@ return done(e,null)
 
     }
     async jwtLoginVerify(req: Request, jwtPayload: {id:string}, done: (...args:any)=>void) {
+        console.log("aca")
+    
         try{
-            
+            console.log(jwtPayload,"aca")
             const user =await this.passportServicedb.findById(jwtPayload.id)
+            console.log(user,"data")
               if (user !==null){    
                 done(null,user)}
                    else throw new UserDontExist() 
         }catch(error){
             console.log(error)
             done(error,null)
-        }
-    }
+        }}
+ 
+ 
 }

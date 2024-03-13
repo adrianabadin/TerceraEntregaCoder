@@ -3,7 +3,7 @@ import { ResponseObject } from "../entities/classes";
 import {TypegooseDAO}  from "../services/typegoose.dao"
 import { UserTS, zodCreateUserType, zodUserType } from './auth.schemas';
 import {sign} from "jsonwebtoken"
-const dbServiceObject = new TypegooseDAO<Omit<zodCreateUserType["body"],"password2">>(UserTS,"UserTG")
+const dbServiceObject = new TypegooseDAO<Omit<zodCreateUserType["body"],"password2">>(UserTS as any,"UserTG")
 
 export class PassportService {
     constructor(){

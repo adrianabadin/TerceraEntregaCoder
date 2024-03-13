@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import { CartService } from "./cart.service";
 import { Products } from "../products/products.schema";
 import { Ref } from "@typegoose/typegoose";
-import { Product } from "./cart.schema";
-
+//import { Product } from "./cart.schema";
+const cartService= new CartService()
 export class CartController {
     constructor(
-        protected service = new CartService(),
+        protected service = cartService,
         public createCart = async (req: Request, res: Response) => {
-            const products: Product[] = req.body
+            const products: {pid:string,quantity:number}[] = req.body
             console.log(products);
             try {
                 const response = await this.service.createCart(products)
@@ -34,11 +34,22 @@ export class CartController {
 
             } catch (error) { console.log(error) }
         },
+        public purchase=async (req: Request, res: Response)=>{
+            if (req.user !==undefined && "email" in req.user)
+            {
+                const response = await this.service.purchase(req.params.cid,req.user.email as string)
+                console.log(response, "final")
+                res.json(response)
+            
+            }
+        },
         public addProduct = async (req: Request, res: Response) => {
             const { pid, cid } = req.params
             const { quantity } = req.query
+            const {email}=req.user as any
             try {
                 let response
+                if (await this.service.validateCart(email,cid)){
                 if (quantity !== undefined) {
                     response = await this.service.addProductById(cid, { pid, quantity: parseInt(quantity as string) })
                     console.log(response)
@@ -47,11 +58,14 @@ export class CartController {
                     } else res.status(404).send({ message: "Something blowed up!" })
                 }
                 else res.status(404).send({ message: "Must provide a quantity param" })
+            }else res.status(404).send({message:"The cart ID provided doesnt match the user logged CID"})
             } catch (error) { console.log(error) }
             console.log(pid, cid, quantity)
         }
         
     ) {
+        this.getCartProduct=this.getCartProduct.bind(this)
+        this.getCartProducts=this.getCartProducts.bind(this)
      }
      async deleteCartProduct (req:Request<{cid?:string,pid?:string}>,res:Response){
         const {cid,pid}=req.params
