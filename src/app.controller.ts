@@ -8,10 +8,16 @@ import { Products } from "./products/products.schema";
 import { Document } from "mongoose";
 import { ChatService } from "./chat/chat.service";
 import { ChatMessage } from "./chat/chat.schema";
+import { appService } from "./app.service";
 export class AppController {
     constructor(
         public productsService = new ProductService(),
+        protected app=appService,
         protected chatService =new ChatService(),
+        public getMock=async (req: Request, res: Response)=>{
+            const content= await this.app.getProductMocks()
+            res.render("index",{content})
+        },
         public getAllProducts = async (req: Request, res: Response) => {
             try {
                 const response = await this.productsService.getData()
