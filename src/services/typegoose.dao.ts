@@ -6,6 +6,7 @@ import { AnyParamConstructor, ModelType } from "@typegoose/typegoose/lib/types";
 import { ResponseObject } from "../entities/classes";
 import { ChatMessage } from "../chat/chat.schema";
 import { UserTS, zodCreateUserType } from "../auth/auth.schemas";
+import  loggerService  from "./logger.service";
 const connectionString="mongodb+srv://dcsweb:adrian123@dcsweb.snm3hyr.mongodb.net/"
 
 export class TypegooseDAO<T extends Products| CartSchema|ChatMessage|Omit<zodCreateUserType["body"],"password2">> {
@@ -21,7 +22,7 @@ protected modelName:string,
                  mongoose.connect(connectionString).then(()=>{
                     this.model=getModelForClass(this.schema,{schemaOptions:{timestamps:true}})
                     TypegooseDAO.instance=this
-                    console.log("Connected to Mongoose")
+                    loggerService.debug("Connected to Mongoose")
                 }).catch(error=>{console.log(error)});
         }
         async addProduct  (product: Omit<T,"_id">) {

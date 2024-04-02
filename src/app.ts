@@ -17,6 +17,9 @@ import "./auth/auth.passport.jwt"
 import {z} from "zod"
 import passport = require("passport");
 import { mailRouter } from "./mailing/mailing.routes";
+import  loggerService  from "./services/logger.service";
+import { logRoutes } from "./services/logger.routes";
+import { loggerController } from "./services/logger.controller";
 declare module 'express-session' {
     interface SessionData {   
       user: string;
@@ -29,7 +32,9 @@ const dotEnvSchema = z.object({
   secret :z.string().min(1,{message:"Must provide a a secret for gitHub oAuth"}),
   callback:z.string().url({message:"Must provide a valid callback for github oAuth"}),
   gmail:z.string().min(3,{message:"Must provide a gmail account key"}),
-  gmailUser:z.string().email()
+  gmailUser:z.string().email(),
+  NODE_ENV:z.enum(["dev","prod"])
+
 })
 dotEnvSchema.parse(process.env)
 declare global {
@@ -70,17 +75,20 @@ app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(appRoutes);
+app.use(loggerController.httpLog)
 app.use("/api/", productRoute);
 app.use("/api/carts", cartRouter);
 app.use("/auth",authRouter)
 app.use("/mail/",mailRouter)
+app.use("/logger",logRoutes)
 app.use(appController.getAllProducts);
 
 io.on('connection', (socket) => { // <- Aquí manejamos las conexiones
-    console.log('a user connected');
+  loggerService.info("Socket Connected")  
+  //console.log('a user connected');
 });
 
-httpServer.listen(PORT, () => console.log(`Connected to port ${PORT}`));
+httpServer.listen(PORT, () => loggerService.info(`Connected to port ${PORT}`));
 
 
 // import { cartRouter } from "./carts/cart.routes";

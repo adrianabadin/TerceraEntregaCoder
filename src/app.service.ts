@@ -12,7 +12,9 @@ export class AppService{
                 code:v4(),
                 title:faker.commerce.product(),
                 description:faker.commerce.productDescription(),
-                price:parseInt(faker.commerce.price({max:200,dec:0})),stock:Math.round((Math.random()*200)),thumbnail:faker.image.urlPlaceholder()})
+                price:parseInt(faker.commerce.price({max:200,dec:0})),
+                stock:Math.round((Math.random()*200)),
+                thumbnail:faker.image.urlPlaceholder()})
         }
         return data
     }
