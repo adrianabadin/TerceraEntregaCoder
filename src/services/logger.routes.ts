@@ -2,8 +2,7 @@ import { Request, Response, Router } from "express";
 import loggerService from "./logger.service";
 
 export const logRoutes=Router()
-logRoutes.get("/test",(req:Request,res:Response)=>{
-    console.log("yo")
+logRoutes.get("/",(req:Request,res:Response)=>{
     loggerService.debug("Debug mode"),
     loggerService.info("Info Mode"),
     loggerService.warning("Warning Mode"),

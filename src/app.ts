@@ -80,7 +80,7 @@ app.use("/api/", productRoute);
 app.use("/api/carts", cartRouter);
 app.use("/auth",authRouter)
 app.use("/mail/",mailRouter)
-app.use("/logger",logRoutes)
+app.use("/loggerTest",logRoutes)
 app.use(appController.getAllProducts);
 
 io.on('connection', (socket) => { // <- Aquí manejamos las conexiones
