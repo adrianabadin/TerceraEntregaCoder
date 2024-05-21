@@ -26,6 +26,10 @@ The server has been implemented using hexagonal layer architecture, theare is a 
 The service provides a class that manage the FS.DAO class and gives access to the actual data. 
 The controller is responsable of handeling the user requests and provide the adecuate responses 
 The routes layer singly links the routes to the controller 
+Error handling is implemented in each layer by ussing a class extension of the error Class that allows me to resolve diferent responses in the controller for most frequent cases. 
+Typegoos schemas are in every layer folder by the name schemas, and they are used to garantee type safety. 
+I havent been able to implement in every layer zod schemas for validation purposes but in the schemas file i whould share the models with zod schemas and theare is a generic function implemented that is able to take a zod validation schema and validates if the request data is provided properly. 
+But since validation is not in the job description and im short in time i vent implemented it on every layer 
 
 
 ## Objectives 
