@@ -9,8 +9,6 @@ export const authController=new AuthController()
 const appController= new AppController()
 const passportController = new PassportController()
 export const authRouter=Router();
-    // authRouter.post("/login",validateSchema(zodUser),authController.login)
-    // authRouter.post("/register",validateSchema(zodCreateUser),authController.register)
     authRouter.post("/login",validateSchema(zodUser),passport.authenticate("login"),authController.jwtSign)
     authRouter.post("/register",validateSchema(zodCreateUser),passport.authenticate("register"),authController.jwtSign)
     authRouter.get("/login",authController.getLogin)

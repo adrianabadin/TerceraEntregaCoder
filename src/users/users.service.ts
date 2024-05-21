@@ -77,8 +77,8 @@ async setPremium(id:string){
     }
 async deleteUsers(){
     try{
-        const date= new Date("2024-05-21T05:20:00.254Z")
-      //  date.setDate(date.getDate()-30)
+        const date= new Date()
+        date.setDate(date.getDate()-30)
         //date.setDate("2024-05-21T04:59:26.481Z")
         const usuarios= await userModel.find({last_connection:{$lt:date}})
         console.log(date,usuarios,"service")
