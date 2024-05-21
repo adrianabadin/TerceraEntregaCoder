@@ -5,7 +5,7 @@ import { zodCreateUser, zodUser } from "./auth.schemas";
 import { PassportController } from "./auth.passport.controller";
 import passport from "passport";
 import { AppController } from "../app.controller";
-const authController=new AuthController()
+export const authController=new AuthController()
 const appController= new AppController()
 const passportController = new PassportController()
 export const authRouter=Router();

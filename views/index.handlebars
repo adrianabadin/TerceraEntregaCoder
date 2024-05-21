@@ -1,17 +1,18 @@
 <main>
     <section>
         {{#each content}}
-        <article class="productCard" id={{id}}>
-            <div class="cardTitle">{{title}}</div>
+        <form class="productCard" id={{id}} method="post" action="/api/carts/{{cid}}/product/{{id}}?quantity=1">
+            <div class=" cardTitle">{{title}}</div>
+
             <div class="cardBody">
                 <span>Description :{{description}}</span>
                 <span>Price :{{price}}</span>
                 <span>Image :{{thumbnail}}</span>
                 <span>Code :{{code}}</span>
-                <span>Stock :{{number}}</span>
+                <span>Stock :{{stock}}</span>
             </div>
-            <button class="cardButon">Ingresar</button>
-        </article>
+            <button type="submit">Add to Cart</button>
+        </form>
         {{/each}}
     </section>
 </main>

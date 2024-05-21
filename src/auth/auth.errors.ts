@@ -50,3 +50,11 @@ export class TokenError extends AuthError{
     }
     
 }
+export class UserNotAuthenticated extends AuthError{
+    public text:string
+    constructor(public errorContent?:any, public message:string="El usuario no esta autenticado",public code:number=406){
+        super(errorContent,message,code)
+        this.text=message
+        this.name="User Not Authenticated"
+    }
+}

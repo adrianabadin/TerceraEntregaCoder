@@ -3,6 +3,10 @@ import { CartService } from "./cart.service";
 import { Products } from "../products/products.schema";
 import { Ref } from "@typegoose/typegoose";
 //import { Product } from "./cart.schema";
+import { UserTS } from '../auth/auth.schemas';
+import { ProductError } from "../products/products.errors";
+import { UserError } from "../users/users.errors";
+import { CartError } from "./carts.errors";
 const cartService= new CartService()
 export class CartController {
     constructor(
@@ -39,28 +43,31 @@ export class CartController {
             {
                 const response = await this.service.purchase(req.params.cid,req.user.email as string)
                 console.log(response, "final")
-                res.json(response)
+                res.render("purchase",{amount:response?.amount,purchaser:response?.purchaser})
+                //res.json(response)
             
             }
         },
         public addProduct = async (req: Request, res: Response) => {
             const { pid, cid } = req.params
             const { quantity } = req.query
-            const {email}=req.user as any
-            try {
+            const {email,role}=req.user as UserTS
                 let response
+                
                 if (await this.service.validateCart(email,cid)){
                 if (quantity !== undefined) {
-                    response = await this.service.addProductById(cid, { pid, quantity: parseInt(quantity as string) })
+                    
+                    response = await this.service.addProductById(email,role,cid, { pid, quantity: parseInt(quantity as string) })
+                    if (response instanceof ProductError || response instanceof UserError || response instanceof CartError)
+                        return res.status(500).send(response)
                     console.log(response)
                     if (response?.ok) {
-                        res.status(200).send(response.data)
-                    } else res.status(404).send({ message: "Something blowed up!" })
+                        return res.redirect("/")
+                    } else return res.status(404).send({ message: "Something blowed up!" })
                 }
-                else res.status(404).send({ message: "Must provide a quantity param" })
-            }else res.status(404).send({message:"The cart ID provided doesnt match the user logged CID"})
-            } catch (error) { console.log(error) }
-            console.log(pid, cid, quantity)
+                else return res.status(404).send({ message: "Must provide a quantity param" })
+            }else return res.status(404).send({message:"The cart ID provided doesnt match the user logged CID"})
+
         }
         
     ) {

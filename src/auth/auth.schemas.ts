@@ -1,4 +1,4 @@
-import { Ref, modelOptions, prop } from "@typegoose/typegoose"
+import { Ref, getModelForClass, modelOptions, prop } from "@typegoose/typegoose"
 import { Products } from '../products/products.schema';
 import mongoose from 'mongoose';
 import Schema from 'mongoose';
@@ -13,8 +13,12 @@ export class UserTS {
 email!:string
 @prop({required:true})
 password!:string
+@prop({required:false})
+documents!:{name:string,reference:string}
 @prop({required:true,default:"user"})
-role!:"admin"|"user"
+role!:"admin"|"user"|"premium"
+@prop({required:false,default:new Date()})
+last_connection!:Date
 @prop({required:true})
 first_name!:string
 @prop({required:true})
@@ -39,7 +43,7 @@ export const  zodUser = z.object({
 export const  zodCreateUser = z.object({
     body:z.object({
         email:z.string({ invalid_type_error:"Username Should be a string"}).nonempty("Must provide a user"),
-        role:z.union([z.literal("admin"),z.literal("user")]),
+        role:z.union([z.literal("admin"),z.literal("user"),z.literal("premium")]),
         password:z.string({invalid_type_error:"Password should be a string"}).nonempty("Must provide a password"),
         password2:z.string({invalid_type_error:"Password should be a string"}).nonempty("Must provide a password"),
         first_name:z.string().min(3,{message:"First name must have at least 3 letters"}),
@@ -51,3 +55,4 @@ export const  zodCreateUser = z.object({
 
 export type zodCreateUserType = z.infer<typeof zodCreateUser>
 export type zodUserType =z.infer<typeof zodUser>
+export const userModel = getModelForClass(UserTS)

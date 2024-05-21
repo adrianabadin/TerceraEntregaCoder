@@ -3,14 +3,17 @@ import { ICartService, IProductService } from "../entities/products";
 import { ProductManager } from "../services/fs.dao";
 import { Response } from 'express';
 import { TypegooseDAO } from "../services/typegoose.dao";
-import { CartSchema, ProductItem, cartModel, newTicket, productItemModel } from './cart.schema';
+import { CartSchema, ProductItem, cartModel,  productItemModel } from './cart.schema';
 import { FilterQuery } from 'mongoose';
 import { Ref, getModelForClass } from '@typegoose/typegoose';
 import { Products, productModel } from '../products/products.schema';
 import { UserTS, zodCreateUserType } from '../auth/auth.schemas';
 import { logger } from '@typegoose/typegoose/lib/logSettings';
 import { ObjectId } from 'mongodb';
-import { TicketService, ticketService } from '../../Ticket/ticket.service';
+import { TicketService, ticketService } from '../Ticket/ticket.service';
+import { ProductError, ProductNotFound } from '../products/products.errors';
+import { CartError, CartNotFound, UnknownCartError } from './carts.errors';
+import { PremiumUserCanBuy, UserError } from '../users/users.errors';
 
 const productManager = new ProductManager<Cart>("./src/carts/carts.json")
 const pm  = new TypegooseDAO<CartSchema>(CartSchema,'carts')
@@ -20,6 +23,8 @@ export class CartService<T extends {pid:string,quantity:number}>  {
     constructor(
         protected dao = pm ,//productManager,
         protected userDao=userDb,
+        protected cart=cartModel,
+        protected product=productModel,
         protected ticketService:TicketService=ticket,
         public createCart = async (products: T[]) => {
           //  const cartObject = new Cart(products)
@@ -70,36 +75,47 @@ export class CartService<T extends {pid:string,quantity:number}>  {
                 return new ResponseObject(error, false, null)
             }
         },
-        public addProductById = async (id: string, product: {pid:string,quantity:number}) => {
+        public addProductById = async (email:string,role:string,id: string, product: {pid:string,quantity:number}) => {
             try {
-                const cartData = await this.dao.getProductById(id)
-                if (cartData !== undefined && cartData!==null && "products" in cartData && Array.isArray(cartData.products))  {
-                    const productData = cartData.products.findIndex((productField:any) => product.pid === `${productField._id}`)
-                    if (productData !== -1) {
-                        const tempProduct=  productItemModel
-                        const response = await tempProduct.findById(product.pid)
-                        if (response !==null)
-                        response.quantity++
-                    } else {
-                        const tempProduct= new productItemModel()
-                        tempProduct.pid=product.pid as any
-                        tempProduct.quantity=product.quantity
-                        tempProduct.save()
-                        console.log(cartData,"aca explota?")
-                        //cartData.products=[...cartData.products,product] as any
-                        //cartData.products.push({pid:product.pid as unknown as Ref<Products>,quantity:product.quantity})
-                        cartData.products.push(tempProduct._id)
-                        cartData.save()
-                        console.log("aca+",cartData)
+                //falta limitar la compra de usuarios premium que no pueden agregar productos propios
+                const productData = await this.product.findById({_id:product.pid})
+                if (productData === null) throw new ProductNotFound()
+                if (role === "premium"){
+                    if (productData.owner ===email){
+                        throw new PremiumUserCanBuy()
                     }
-                    const response = await this.dao.updateProduct(id, cartData)
-                    if (response !== undefined) {
-                        return new ResponseObject(null, true, response)
-                    } else return new ResponseObject("Caboom", false, null)
                 }
+                const cartData = await this.cart.findById({_id:id}).populate({path:"products",populate:{path:"pid",model:"Products"}}).exec() //await this.dao.getProductById(id)
+                if (cartData === null ) throw new CartNotFound()
+                let result:boolean =false
+                cartData?.products.forEach((producto:any)=>{
+                    console.log(producto.pid._id,"xxxxxxxxxxxxxxxxx",product.pid)
+                    if (((producto as any).pid._id).toString() === product.pid) result=true
+                })
+                console.log(result,"bool",product.pid)
+                if (result === undefined) {
+                    const productItem=await productItemModel.create(product)
+                    cartData.products.push(productItem)
+                    cartData.save()
+                    const productResponse=await productModel.findById(product.pid)
+                    if (productResponse ===null) throw new ProductNotFound()
+                    productResponse.stock-=product.quantity
+                    productResponse.save()
+
+                }else{
+                    const item= await productItemModel.findOne({pid:product.pid}).exec()
+                    if (item !==null) item.quantity += product.quantity
+                    item?.save()
+                    const productStock=await productModel.findById(product.pid)     
+                    if (productStock === null) throw new ProductNotFound()
+                    productStock.stock-= product.quantity
+                    productStock?.save()
+                }
+
+                return new ResponseObject(null,true,{message:"Product Added"})
             } catch (error) {
-                console.log(error)
-                return new ResponseObject(error, false, null)
+                if (error instanceof ProductError || error instanceof UserError || error instanceof CartError) return error
+                return new UnknownCartError(error)
             }
         }
     ) {

@@ -54,7 +54,7 @@ protected modelName:string,
         }
         async getProductById (id:string){
             try {
-                const data = await this.model.findById(id)
+                const data = await this.model.findById(id) 
                 return data
             }catch(e){console.log(e)}
         }

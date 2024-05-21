@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { zodCreateUserType } from './auth.schemas';
+import { userModel, zodCreateUserType } from './auth.schemas';
 import { PassportService } from "./auth.pasport.service";
+import { UserDontExist } from "./auth.errors";
 const passportService =  new PassportService()
 export class AuthController{
     constructor(protected service =passportService){
@@ -27,9 +28,19 @@ this.validateRol=this.validateRol.bind(this)
         res.render("profile",{user:{email:data.email,role:data.role,createdAt:data.createdAt,name:data.first_name,lastName:data.last_name,age:data.age}})
     }
     }
-    validateRol (admitedRoles:zodCreateUserType["body"]["role"]){return (req:Request,res:Response,next:NextFunction)=>{
+    validateRol (admitedRoles:zodCreateUserType["body"]["role"]|zodCreateUserType["body"]["role"][]){return (req:Request,res:Response,next:NextFunction)=>{
     console.log("dentro de validateRol",req.user)
     if (req.user !== undefined && "role" in req.user){
+        if (Array.isArray(admitedRoles) && admitedRoles.length>0){
+            admitedRoles.forEach(item=>{
+                if(req.user !== undefined && "role" in req.user) 
+                if (item===req.user.role) 
+                    {
+                    console.log("Autorizado")
+                     next()
+                    }
+})
+        }
         if (admitedRoles === req.user.role)  {
             console.log("Autorizado")
             next()
@@ -39,7 +50,9 @@ this.validateRol=this.validateRol.bind(this)
     }else res.render("login")
     }}
     logout(req:Request,res:Response){
-        req.session.destroy((error)=>res.send({message:"Unable to destroy session",error}))
+        //req.session.destroy((error)=>res.send({message:"Unable to destroy session",error}))
+        res.clearCookie("jwt")
+        res.redirect("/auth/login")
 
     }
     async jwtSign(req:Request,res:Response,next:NextFunction){
@@ -49,17 +62,19 @@ this.validateRol=this.validateRol.bind(this)
             {
                 const {_id:id}=req.user
                 console.log(id,passportService,"empty")
+                const lastConection=await  userModel.findByIdAndUpdate({_id:id},{last_connection:new Date()},{new:true})
+                if (lastConection ===null) return res.status(401).send(new UserDontExist())
                 const response = await  this.service.signJWT(`${id}`)
                 res.clearCookie("jwt")
                 res.cookie("jwt",response,{secure:true})
                 next()
                 return
-            }else {res.status(403).send("Authentication failed")
-        return
+            }else {return res.status(403).send("Authentication failed")
+        
         }
         
-        }res.status(403).send("Not Authenticated")
-        return
+        }return res.status(403).send("Not Authenticated")
+        
         
             
                 }

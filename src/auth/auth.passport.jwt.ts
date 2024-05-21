@@ -5,6 +5,7 @@ import { PassportController } from "./auth.passport.controller";
 import { TokenError } from "./auth.errors";
 const passportController= new PassportController()
 function cookieExtractor(req:Request):string{
+try{
     if ( req.headers.authorization !== undefined ) {
         console.log("coso",req.headers.authorization)
         return req.headers.authorization
@@ -13,6 +14,7 @@ function cookieExtractor(req:Request):string{
         return req.cookies.jwt
 } 
 throw new TokenError()
+}catch(e){return e as any}
 }
 passport.use('jwt',
     new Strategy(

@@ -12,3 +12,4 @@ appRoutes.get("/chat",passport.authenticate("jwt"),authController.validateRol("u
 appRoutes.get("/logued",appController.loguedUser)
 appRoutes.get("/mockingProducts",appController.getMock)
 appRoutes.get("/loggerTest",logRoutes)
+appRoutes.get("/cart",appController.getCart)

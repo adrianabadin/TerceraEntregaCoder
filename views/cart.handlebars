@@ -1,0 +1,13 @@
+<section style="display: flex;flex-direction: column;">
+    <h2>Cart Items</h2>
+    <form method="post" action="/api/carts/{{cid}}/purchase">
+        {{#each product}}
+        <article style="padding: 10px;">
+            <h4>{{title}}</h4>
+            <p>{{price}}</p>
+            <p>{{quantity}}</p>
+        </article>
+        {{/each}}
+        <button type="submit">Terminar compra</button>
+    </form>
+</section>

@@ -3,61 +3,72 @@ import { ResponseObject } from "../entities/classes";
 import { IProductService, Product } from "../entities/products";
 import { ProductManager } from "../services/fs.dao";
 import { TypegooseDAO } from "../services/typegoose.dao";
-import { Products } from "./products.schema";
+import { productModel, Products } from "./products.schema";
+import { ProductError, ProductNotFound, UnknowProductError, ProductCreateError } from './products.errors';
+import { mailService } from "../mailing/mailing.service";
 //const productManager = new ProductManager<Product>("./src/products/products.json")
 const pm=new TypegooseDAO<Products>(Products,"products")
 export class ProductService  {
     constructor(
         protected dao = pm,//productManager,
-        public getData = async (limit?: number,page?:number,sort?:{field:keyof Product,descending:boolean},query?:FilterQuery<Product>) => {
+        protected model=productModel,
+        protected mail = mailService,
+        public getData = async (limit: number=10,page:number=1,sort?:{field:keyof Product,descending:boolean},query?:FilterQuery<Product>) => {
             try {
                 
-                const data = await this.dao.getProducts(limit,page,sort,query)
-                return new ResponseObject<Products>(null, true, data as any||null)
+                const productCount = await this.model.countDocuments()
+                const totalPages =Math.ceil( productCount/limit)
+                const data= (await this.model.find(query||{}).skip((totalPages-1)*limit).limit(limit).sort(sort?.field))
+                
+               return data
             } catch (e) {
-                console.log(e)
-                return new ResponseObject<Products>(e, false, null)
+                return new UnknowProductError(e)
             }
         },
         public getById = async (id: string) => {
             try {
-                const data = await this.dao.getProductById(id)
-                if (data !== undefined) return new ResponseObject<Products>(null, true, data)
-                else return new ResponseObject<Products>("Product not found", false, null)
+                
+                const data = await  productModel.findById(id)//await this.dao.getProductById(id)
+                if (data !== null )  return data.toObject()
+                else throw new ProductNotFound()
             }
             catch (error) {
                 console.log(error)
-                return new ResponseObject<Products>(error, false, null)
+                if (error instanceof ProductError) return error
+                else return new UnknowProductError(error)
             }
         },
         public addProduct = async (product: Products|Omit<Products,"id">) => {
             try {
-                const response = await this.dao.addProduct(product)
-                return new ResponseObject<Products>(null, true, response as Products)
+                const response =(await productModel.create(product)).toObject() // await this.dao.addProduct(product)
+                return response
 
             } catch (error) {
-                console.log(error)
-                return new ResponseObject<Products>(error, false, null)
+                
+                return new ProductCreateError(error)
             }
         },
         public updateProduct = async (product: Products&{_id:any}) => {
             try {
-                const response = await this.dao.updateProduct(product._id, product)
-                return new ResponseObject<any>(null, true, response)
+                const response = (await productModel.findByIdAndUpdate({_id:product._id},product,{new:true}))?.toObject() //await this.dao.updateProduct(product._id, product)
+                if (response === null) throw new ProductNotFound()
+                return response
 
             } catch (error) {
-                console.log(error)
-                return new ResponseObject<Products>(error, false, null)
+                if (error instanceof ProductError) return error
+                else return new UnknowProductError(error)
+                
             }
         },
-        public deleteProduct = async (id: string): Promise<ResponseObject<null> | undefined> => {
+        public deleteProduct = async (id: string,owner:string) => {
             try {
-                await this.dao.deleteProduct(id)
-                return new ResponseObject<null>(null, true, null)
-
+                const response = (await productModel.findByIdAndDelete({_id:id,owner}))?.toObject()
+                if (response === undefined || response === null) throw new ProductNotFound()
+                if (response.owner !== "admin") this.mail.sendEmail(response.owner,"Producto eliminado","El producto que usted publico ha sido eliminado")
+                    return response
             } catch (error) {
-                console.log(error)
-                return new ResponseObject<null>(error, false, null)
+                if (error instanceof ProductError) return error
+else  return new UnknowProductError(error)
             }
         }
     ) {

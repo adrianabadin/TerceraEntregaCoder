@@ -3,6 +3,8 @@ import { Severity, getModelForClass, modelOptions, prop } from "@typegoose/typeg
 export class Products{
     @prop({required: true})
      public code!: string;
+     @prop({required:false})
+     owner!:string;
      @prop({required: true})
      public description!: string;
      @prop({required: true})

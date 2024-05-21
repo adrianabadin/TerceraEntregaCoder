@@ -25,18 +25,6 @@ export class CartSchema {
 }
 export const cartModel=getModelForClass(CartSchema)
 
-@modelOptions({options:{allowMixed:0}})
-export class Ticket{
-    @prop({required:true,default:0})
-    public amount!:number
-    @prop({required:true})
-    public purchaser!:string
-    @prop({required:true,default:new mongoose.mongo.ObjectId(),unique:true})
-    public code!:string
-    @prop({required:true,default:new Date()})
-    public purchased_datatime!:Date
-}
-export const newTicket = getModelForClass(Ticket,{schemaOptions:{timestamps:{createdAt:"purchased_datatime"}}})
 /**
  * - Id (autogenerado por mongo)
 - code: String debe autogenerarse y ser único

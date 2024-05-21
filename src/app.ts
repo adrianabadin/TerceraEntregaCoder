@@ -20,6 +20,8 @@ import { mailRouter } from "./mailing/mailing.routes";
 import  loggerService  from "./services/logger.service";
 import { logRoutes } from "./services/logger.routes";
 import { loggerController } from "./services/logger.controller";
+import  usersRouter  from "./users/users.routes";
+import ticketRouter from "./Ticket/ticket.routes";
 declare module 'express-session' {
     interface SessionData {   
       user: string;
@@ -78,6 +80,8 @@ app.use(appRoutes);
 app.use(loggerController.httpLog)
 app.use("/api/", productRoute);
 app.use("/api/carts", cartRouter);
+app.use("/api/users",usersRouter)
+app.use("/api/tickets",ticketRouter)
 app.use("/auth",authRouter)
 app.use("/mail/",mailRouter)
 app.use("/loggerTest",logRoutes)
