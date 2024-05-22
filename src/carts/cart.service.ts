@@ -81,7 +81,9 @@ export class CartService<T extends {pid:string,quantity:number}>  {
                 const productData = await this.product.findById({_id:product.pid})
                 if (productData === null) throw new ProductNotFound()
                 if (role === "premium"){
+                    console.log("premium user")
                     if (productData.owner ===email){
+                        console.log("premium and owner")
                         throw new PremiumUserCanBuy()
                     }
                 }
@@ -93,7 +95,7 @@ export class CartService<T extends {pid:string,quantity:number}>  {
                     if (((producto as any).pid._id).toString() === product.pid) result=true
                 })
                 console.log(result,"bool",product.pid)
-                if (result === undefined) {
+                if (result === false) {
                     const productItem=await productItemModel.create(product)
                     cartData.products.push(productItem)
                     cartData.save()

@@ -58,6 +58,7 @@ export class CartController {
                 if (quantity !== undefined) {
                     
                     response = await this.service.addProductById(email,role,cid, { pid, quantity: parseInt(quantity as string) })
+                    console.log(response,"controller")
                     if (response instanceof ProductError || response instanceof UserError || response instanceof CartError)
                         return res.status(500).send(response)
                     console.log(response)
