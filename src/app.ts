@@ -35,7 +35,8 @@ const dotEnvSchema = z.object({
   callback:z.string().url({message:"Must provide a valid callback for github oAuth"}),
   gmail:z.string().min(3,{message:"Must provide a gmail account key"}),
   gmailUser:z.string().email(),
-  NODE_ENV:z.enum(["dev","prod"])
+  NODE_ENV:z.enum(["dev","prod"]),
+  
 
 })
 dotEnvSchema.parse(process.env)
@@ -64,12 +65,12 @@ io.engine.use((req:Request, res:Response, next:NextFunction) => {
 }
 );
 const appController = new AppController();
-app.use(express.static('src/public'));
+app.use(express.static(process.env.NODE_ENV === "dev"?'src/public':'public'));
 app.engine("handlebars", engine());
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
-const PORT = 8080;
+const PORT = 8085;
 app.use(session)
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

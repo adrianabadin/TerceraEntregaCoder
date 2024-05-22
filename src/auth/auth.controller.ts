@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { userModel, zodCreateUserType } from './auth.schemas';
+import { userModel, UserTS, zodCreateUserType } from './auth.schemas';
 import { PassportService } from "./auth.pasport.service";
 import { UserDontExist } from "./auth.errors";
 const passportService =  new PassportService()
@@ -29,26 +29,34 @@ this.validateRol=this.validateRol.bind(this)
     }
     }
     validateRol (admitedRoles:zodCreateUserType["body"]["role"]|zodCreateUserType["body"]["role"][]){return (req:Request,res:Response,next:NextFunction)=>{
-    console.log("dentro de validateRol",req.user)
+        let bool:boolean 
+        bool=false
+        console.log("dentro de validateRol",req.user)
+    const {role} = req.user  as UserTS
+
     if (req.user !== undefined && "role" in req.user){
         if (Array.isArray(admitedRoles) && admitedRoles.length>0){
             admitedRoles.forEach(item=>{
-                if(req.user !== undefined && "role" in req.user) 
-                if (item===req.user.role) 
+     console.log(item,role)
+                if(role !== undefined) 
+                if (item===role) 
                     {
                     console.log("Autorizado")
-                     next()
+                     bool=true
                     }
 })
+if (bool as boolean===true ) return next()
         }
         if (admitedRoles === req.user.role)  {
             console.log("Autorizado")
-            next()
+            return next()
 }        else {
     console.log("No Autorizado"	)
-    res.send("Unauthorized")}
-    }else res.render("login")
-    }}
+    return res.send("Unauthorized")}
+    }else return res.render("login")
+    }
+
+}
     logout(req:Request,res:Response){
         //req.session.destroy((error)=>res.send({message:"Unable to destroy session",error}))
         res.clearCookie("jwt")
