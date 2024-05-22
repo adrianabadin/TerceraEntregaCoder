@@ -1,16 +1,12 @@
 import { Cart, ResponseObject } from '../entities/classes';
-import { ICartService, IProductService } from "../entities/products";
 import { ProductManager } from "../services/fs.dao";
-import { Response } from 'express';
 import { TypegooseDAO } from "../services/typegoose.dao";
 import { CartSchema, ProductItem, cartModel,  productItemModel } from './cart.schema';
 import { FilterQuery } from 'mongoose';
-import { Ref, getModelForClass } from '@typegoose/typegoose';
+import { getModelForClass } from '@typegoose/typegoose';
 import { Products, productModel } from '../products/products.schema';
 import { UserTS, zodCreateUserType } from '../auth/auth.schemas';
-import { logger } from '@typegoose/typegoose/lib/logSettings';
-import { ObjectId } from 'mongodb';
-import { TicketService, ticketService } from '../Ticket/ticket.service';
+import { TicketService } from '../Ticket/ticket.service';
 import { ProductError, ProductNotFound } from '../products/products.errors';
 import { CartError, CartNotFound, UnknownCartError } from './carts.errors';
 import { PremiumUserCanBuy, UserError } from '../users/users.errors';

@@ -8,7 +8,7 @@ const appController = new AppController();
 const authController= new AuthController()
 appRoutes.get("/realTimeProducts", appController.realTimeProducts)
 appRoutes.get("/addProduct", appController.addProduct)
-appRoutes.get("/chat",passport.authenticate("jwt"),authController.validateRol("user") ,appController.chat)
+appRoutes.get("/chat",passport.authenticate("jwt"),authController.validateRol(["user","premium"]) ,appController.chat)
 appRoutes.get("/logued",appController.loguedUser)
 appRoutes.get("/mockingProducts",appController.getMock)
 appRoutes.get("/loggerTest",logRoutes)
