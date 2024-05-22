@@ -90,9 +90,12 @@ export class CartService<T extends {pid:string,quantity:number}>  {
                 const cartData = await this.cart.findById({_id:id}).populate({path:"products",populate:{path:"pid",model:"Products"}}).exec() //await this.dao.getProductById(id)
                 if (cartData === null ) throw new CartNotFound()
                 let result:boolean =false
+            let productItemId:string =""
                 cartData?.products.forEach((producto:any)=>{
                     console.log(producto.pid._id,"xxxxxxxxxxxxxxxxx",product.pid)
-                    if (((producto as any).pid._id).toString() === product.pid) result=true
+                    if (((producto as any).pid._id).toString() === product.pid) {
+                        productItemId=producto._id
+                        result=true}
                 })
                 console.log(result,"bool",product.pid)
                 if (result === false) {
@@ -105,7 +108,9 @@ export class CartService<T extends {pid:string,quantity:number}>  {
                     productResponse.save()
 
                 }else{
-                    const item= await productItemModel.findOne({pid:product.pid}).exec()
+                    if (productItemId === "" ) throw new ProductNotFound()
+                    const item= await productItemModel.findOne({_id:productItemId}).exec()
+                    console.log(item,"DDDD")
                     if (item !==null) item.quantity += product.quantity
                     item?.save()
                     const productStock=await productModel.findById(product.pid)     
